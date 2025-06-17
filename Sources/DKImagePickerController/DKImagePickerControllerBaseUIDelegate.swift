@@ -119,7 +119,7 @@ open class DKImagePickerControllerBaseUIDelegate: NSObject, DKImagePickerControl
         
         // Create label
         let label = UILabel()
-        label.text = "You've given Aao Chat access to only a select number of photos."
+        label.text = "You've given \(Bundle.main.infoDictionary?[kCFBundleNameKey as String] as? String ?? "") access to only a select number of photos."
         label.textAlignment = .center
         label.font = UIFont.systemFont(ofSize: 14, weight: .medium)
         label.textColor = .black

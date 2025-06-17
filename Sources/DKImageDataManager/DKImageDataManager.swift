@@ -72,7 +72,12 @@ public class DKImageDataManager {
                 }
             }
         } else {
-            handler(isGranted(status), status == .limited)
+            if #available(iOS 14, *) {
+                handler(isGranted(status), status == .limited)
+            } else {
+                // Fallback on earlier versions
+                handler(isGranted(status), false)
+            }
         }
     }
     
