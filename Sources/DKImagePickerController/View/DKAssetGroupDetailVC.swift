@@ -9,6 +9,7 @@
 import UIKit
 import AVFoundation
 import Photos
+import PhotosUI
 
 private extension UICollectionView {
 
@@ -55,7 +56,7 @@ open class DKAssetGroupDetailVC: UIViewController,
     
     override open func viewDidLoad() {
         super.viewDidLoad()
-
+        self.view.backgroundColor = .white
         guard let imagePickerController = imagePickerController else {
             assertionFailure("Expect imagePickerController")
             return
@@ -73,6 +74,8 @@ open class DKAssetGroupDetailVC: UIViewController,
 
         self.collectionView = collectionView
 
+        checkPhotoPermission()
+
 		footerView = imagePickerController.UIDelegate.imagePickerControllerFooterView(imagePickerController)
 		if let footerView = footerView {
 			view.addSubview(footerView)
@@ -84,7 +87,6 @@ open class DKAssetGroupDetailVC: UIViewController,
         }
 
 		hidesCamera = imagePickerController.sourceType == .photo
-		checkPhotoPermission()
 
         if imagePickerController.allowSwipeToSelect && !imagePickerController.singleSelect {
             let swipeOutGesture: UIPanGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(self.swiping(gesture:)))
@@ -190,9 +192,11 @@ open class DKAssetGroupDetailVC: UIViewController,
 			self.collectionView?.isHidden = true
 		}
 
-		DKImageDataManager.checkPhotoPermission { granted in
-			granted ? self.reload() : photoDenied()
-		}
+        DKImageDataManager.checkPhotoPermission { granted, isLimited  in
+            debugPrint("Photo permission granted::: \(granted), limited::: \(isLimited)")
+            self.imagePickerController?.allowMoreSelection = isLimited
+            granted ? self.reload() : photoDenied()
+        }
 	}
 
     func selectAssetGroup(_ groupId: String?) {

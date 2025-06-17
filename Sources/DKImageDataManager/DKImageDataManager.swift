@@ -18,7 +18,7 @@ public func getImageDataManager() -> DKImageDataManager {
 
 public class DKImageDataManager {
 	
-	public class func checkPhotoPermission(_ handler: @escaping (_ granted: Bool) -> Void) {
+	/*public class func checkPhotoPermission(_ handler: @escaping (_ granted: Bool) -> Void) {
 		func hasPhotoPermission() -> Bool {
 			return PHPhotoLibrary.authorizationStatus() == .authorized
 		}
@@ -33,8 +33,49 @@ public class DKImageDataManager {
 					hasPhotoPermission() ? handler(true) : handler(false)
 				})
 			}) : handler(false))
-	}
+	}*/
 	
+    public class func checkPhotoPermission(_ handler: @escaping (_ granted: Bool, _ isLimited: Bool) -> Void) {
+        
+        func currentStatus() -> PHAuthorizationStatus {
+            if #available(iOS 14, *) {
+                return PHPhotoLibrary.authorizationStatus(for: .readWrite)
+            } else {
+                return PHPhotoLibrary.authorizationStatus()
+            }
+        }
+
+        func isGranted(_ status: PHAuthorizationStatus) -> Bool {
+            if #available(iOS 14, *) {
+                return status == .authorized || status == .limited
+            }else {
+                // For iOS 13 and below, .limited is not available.
+                return status == .authorized
+            }
+//            return status == .authorized || (status == .limited && #available(iOS 14, *))
+        }
+
+        let status = currentStatus()
+
+        if status == .notDetermined {
+            if #available(iOS 14, *) {
+                PHPhotoLibrary.requestAuthorization(for: .readWrite) { newStatus in
+                    DispatchQueue.main.async {
+                        handler(isGranted(newStatus), newStatus == .limited)
+                    }
+                }
+            } else {
+                PHPhotoLibrary.requestAuthorization { newStatus in
+                    DispatchQueue.main.async {
+                        handler(isGranted(newStatus), false)
+                    }
+                }
+            }
+        } else {
+            handler(isGranted(status), status == .limited)
+        }
+    }
+    
 	static let sharedInstance = DKImageDataManager()
 	
     private let manager = PHCachingImageManager()

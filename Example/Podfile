@@ -6,7 +6,7 @@ inhibit_all_warnings!
 
 target 'DKImagePickerControllerDemo' do
 
-  pod 'DKImagePickerController', :path => '../'
+  pod 'DKImagePickerController', :git => 'https://github.com/rakeshss123/DKImagePickerController.git', :branch => 'develop'
 
   # Pods for DKImagePickerControllerDemo
 

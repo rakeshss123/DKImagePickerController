@@ -112,6 +112,47 @@ open class DKImagePickerControllerBaseUIDelegate: NSObject, DKImagePickerControl
         return self.doneButton!
     }
 
+    open func createHeaderViewIfNeeded() -> UIView {
+        let headerView = UIView(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: 70))
+        
+        headerView.backgroundColor = .white
+        
+        // Create label
+        let label = UILabel()
+        label.text = "You've given Aao Chat access to only a select number of photos."
+        label.textAlignment = .center
+        label.font = UIFont.systemFont(ofSize: 14, weight: .medium)
+        label.textColor = .label
+        label.numberOfLines = 0
+        
+        // Create button
+        let button = UIButton(type: .system)
+        button.setTitle("Manage", for: .normal)
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .bold)
+        button.addTarget(self.imagePickerController, action: #selector(DKImagePickerController.allowMoreImageSelection), for: .touchUpInside)
+        
+        // Create stack view
+        let stackView = UIStackView(arrangedSubviews: [label, button])
+        stackView.axis = .vertical
+        stackView.alignment = .fill
+        stackView.spacing = 2
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        
+        // Add stack to header view
+        headerView.addSubview(stackView)
+        
+        // Constraints
+        NSLayoutConstraint.activate([
+            stackView.topAnchor.constraint(equalTo: headerView.topAnchor, constant: 5),
+            stackView.bottomAnchor.constraint(equalTo: headerView.bottomAnchor, constant: -5),
+            stackView.centerXAnchor.constraint(equalTo: headerView.centerXAnchor),
+            stackView.leadingAnchor.constraint(greaterThanOrEqualTo: headerView.leadingAnchor, constant: 16),
+            stackView.trailingAnchor.constraint(lessThanOrEqualTo: headerView.trailingAnchor, constant: -16)
+        ])
+        
+        return headerView
+    }
+    
     open func createSelectGroupButtonIfNeeded() -> UIButton {
         if self.selectGroupButton == nil {
             let button = UIButton()
@@ -245,6 +286,10 @@ open class DKImagePickerControllerBaseUIDelegate: NSObject, DKImagePickerControl
     }
 
     open func imagePickerControllerHeaderView(_ imagePickerController: DKImagePickerController) -> UIView? {
+        if self.imagePickerController.allowMoreSelection {
+            // Show header view only if allowMoreSelection is true
+            return createHeaderViewIfNeeded()
+        }
         return nil
     }
 

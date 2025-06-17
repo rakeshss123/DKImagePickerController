@@ -8,6 +8,7 @@
 
 import UIKit
 import Photos
+import PhotosUI
 
 /**
  - AllPhotos: Get all photos assets in the assets group.
@@ -91,6 +92,9 @@ open class DKImagePickerController: DKUINavigationController, DKImageBaseManager
     
     /// Allow select all
     @objc public var allowSelectAll: Bool = false
+    
+    /// Allow more select
+    @objc public var allowMoreSelection: Bool = false
     
     /// A Bool value indicating whether the inline mode is enabled.
     @objc public var inline: Bool = false
@@ -598,6 +602,32 @@ open class DKImagePickerController: DKUINavigationController, DKImageBaseManager
             }
             
             self.notify(with: #selector(DKImagePickerControllerObserver.imagePickerControllerDidSelect(assets:)), object: insertedAssets as AnyObject)
+        }
+    }
+    
+    @objc open func allowMoreImageSelection() {
+        if let groupDetailVC = self.viewControllers.first as? DKAssetGroupDetailVC {
+            let alert = UIAlertController(title: "Manage access to photos and videos",
+                                          message: nil,
+                                          preferredStyle: .actionSheet)
+            alert.addAction(UIAlertAction(title: "Select more photos",
+                                          style: .default, handler: { _ in
+                DispatchQueue.main.async {
+                    PHPhotoLibrary.shared().presentLimitedLibraryPicker(from: self)
+                }
+            }))
+            alert.addAction(UIAlertAction(title: "Change settings",
+                                          style: .default, handler: { _ in
+                if let url = URL(string: UIApplication.openSettingsURLString) {
+                    if UIApplication.shared.canOpenURL(url) {
+                        UIApplication.shared.open(url, options: [:], completionHandler: nil)
+                    }
+                }
+            }))
+            alert.addAction(UIAlertAction(title: "Cancel",
+                                            style: .cancel, handler: nil))
+            
+            self.present(alert, animated: true, completion: nil)
         }
     }
     
