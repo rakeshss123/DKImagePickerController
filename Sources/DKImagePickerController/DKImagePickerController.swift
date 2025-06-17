@@ -613,7 +613,11 @@ open class DKImagePickerController: DKUINavigationController, DKImageBaseManager
             alert.addAction(UIAlertAction(title: "Select more photos",
                                           style: .default, handler: { _ in
                 DispatchQueue.main.async {
-                    PHPhotoLibrary.shared().presentLimitedLibraryPicker(from: self)
+                    if #available(iOS 14, *) {
+                        PHPhotoLibrary.shared().presentLimitedLibraryPicker(from: self)
+                    } else {
+                        // Fallback on earlier versions
+                    }
                 }
             }))
             alert.addAction(UIAlertAction(title: "Change settings",

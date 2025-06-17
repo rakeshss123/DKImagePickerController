@@ -122,7 +122,7 @@ open class DKImagePickerControllerBaseUIDelegate: NSObject, DKImagePickerControl
         label.text = "You've given Aao Chat access to only a select number of photos."
         label.textAlignment = .center
         label.font = UIFont.systemFont(ofSize: 14, weight: .medium)
-        label.textColor = .label
+        label.textColor = .black
         label.numberOfLines = 0
         
         // Create button
@@ -286,7 +286,7 @@ open class DKImagePickerControllerBaseUIDelegate: NSObject, DKImagePickerControl
     }
 
     open func imagePickerControllerHeaderView(_ imagePickerController: DKImagePickerController) -> UIView? {
-        if self.imagePickerController.allowMoreSelection {
+        if self.imagePickerController.allowMoreSelection, #available(iOS 14, *) {
             // Show header view only if allowMoreSelection is true
             return createHeaderViewIfNeeded()
         }
